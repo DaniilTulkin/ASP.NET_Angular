@@ -9,8 +9,11 @@ namespace API
 {
     public class BuggyController : BaseApiController
     {
-        public BuggyController(DataContext context) 
-            : base(context) { }
+        private readonly DataContext context;
+        public BuggyController(DataContext context)  
+        {
+            this.context = context;
+        }
 
         [Authorize]
         [HttpGet("auth")]
@@ -20,14 +23,14 @@ namespace API
 
         [HttpGet("not-found")]
         public ActionResult<AppUser> GetNotFound() {
-            var thing = Context.Users.Find(-1);
+            var thing = context.Users.Find(-1);
             if (thing == null) return NotFound();
             return Ok(thing);
         }
 
         [HttpGet("server-error")]
         public ActionResult<string> GetServerError() {
-            var thing = Context.Users.Find(-1);
+            var thing = context.Users.Find(-1);
             var thingToReturn = thing.ToString();
 
             return thingToReturn;

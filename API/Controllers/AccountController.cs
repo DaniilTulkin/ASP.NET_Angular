@@ -13,10 +13,11 @@ namespace API.Controllers
     public class AccountController : BaseApiController
     {
         private readonly ITokenService tokenService;
+        private readonly DataContext context;
 
         public AccountController(DataContext context, ITokenService tokenService)
-            : base(context)
         {
+            this.context = context;
             this.tokenService = tokenService;
         }
 
@@ -34,8 +35,8 @@ namespace API.Controllers
                 PasswordSalt = hmac.Key
             };
 
-            Context.Users.Add(user);
-            await Context.SaveChangesAsync();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
             return new UserDTO
             {
                 UserName = user.UserName,
@@ -46,7 +47,7 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> LoginAsync(LoginDTO loginDTO)
         {
-            var user = await Context.Users
+            var user = await context.Users
                 .SingleOrDefaultAsync(x => x.UserName == loginDTO.UserName);
             if (user == null) return Unauthorized("Invalid user name");
 
@@ -66,6 +67,6 @@ namespace API.Controllers
         } 
 
         private async Task<bool> UserExists(string userName) =>
-            await Context.Users.AnyAsync(x => x.UserName == userName.ToLower());
+            await context.Users.AnyAsync(x => x.UserName == userName.ToLower());
     }
 }
