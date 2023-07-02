@@ -4,6 +4,7 @@ using API.Entities;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,7 @@ namespace API.Controllers
         public async Task<ActionResult<UserDTO>> LoginAsync(LoginDTO loginDTO)
         {
             var user = await context.Users
+                .Include(x => x.Photos)
                 .SingleOrDefaultAsync(x => x.UserName == loginDTO.UserName);
             if (user == null) return Unauthorized("Invalid user name");
 
@@ -62,7 +64,8 @@ namespace API.Controllers
             return new UserDTO
             {
                 UserName = user.UserName,
-                Token = tokenService.CreateToken(user)
+                Token = tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             };
         } 
 
