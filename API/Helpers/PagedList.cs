@@ -25,7 +25,7 @@ namespace API.Helpers
             AddRange(items);
         }
 
-        public static async Task<PagedList<T>> CreatAsync(IQueryable<T> source,
+        public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source,
                                                           int pageNumber,
                                                           int pageSize) 
         {
