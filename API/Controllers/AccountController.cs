@@ -35,11 +35,7 @@ namespace API.Controllers
 
             var user = mapper.Map<AppUser>(registerDTO);
 
-            using var hmac = new HMACSHA512();
-            
             user.UserName = registerDTO.UserName.ToLower();
-            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password));
-            user.PasswordSalt = hmac.Key;
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
@@ -59,14 +55,6 @@ namespace API.Controllers
                 .Include(x => x.Photos)
                 .SingleOrDefaultAsync(x => x.UserName == loginDTO.UserName);
             if (user == null) return Unauthorized("Invalid user name");
-
-            using var hmac = new HMACSHA512(user.PasswordSalt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != user.PasswordHash[i]) 
-                    return Unauthorized("Invalid password");
-            }
 
             return new UserDTO
             {

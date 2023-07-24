@@ -30,7 +30,10 @@ namespace API.Data
             context.Messages.Remove(message);
 
         public async Task<Message> GetMessageAsync(int id) =>
-            await context.Messages.FindAsync(id);
+            await context.Messages
+                .Include(u => u.Sender)
+                .Include(u => u.Recipient)
+                .FirstOrDefaultAsync(u => u.Id == id); 
 
         public async Task<PagedList<MessageDTO>> GetMessagesForUserAsync(
             MessageParams messageParams)
@@ -41,9 +44,12 @@ namespace API.Data
 
             query = messageParams.Container switch 
             {
-                "inbox" => query.Where(u => u.Recipient.UserName == messageParams.UserName),
-                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.UserName),
+                "inbox" => query.Where(u => u.Recipient.UserName == messageParams.UserName &&
+                    u.RecipientDeleted == false),
+                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.UserName &&
+                    u.SenderDeleted == false),
                 _ => query.Where(u => u.Recipient.UserName == messageParams.UserName && 
+                    u.RecipientDeleted == false &&  
                     u.DateRead == null)
             };
 
@@ -62,9 +68,11 @@ namespace API.Data
                 .Include(u => u.Recipient)
                 .ThenInclude(p => p.Photos)
                 .Where(m => m.Recipient.UserName == currentUserName && 
+                    m.RecipientDeleted == false &&
                     m.Sender.UserName == recipientUserName || 
                     m.Recipient.UserName == recipientUserName && 
-                    m.Sender.UserName == currentUserName)
+                    m.Sender.UserName == currentUserName && 
+                    m.SenderDeleted == false)
                 .OrderBy(m => m.MessageSent)
                 .ToListAsync();
 
