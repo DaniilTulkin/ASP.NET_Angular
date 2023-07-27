@@ -33,11 +33,11 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<MemberDTO>>> GetUsersAsync(
             [FromQuery]UserParams userParams) 
         {
-            var user = await unitOfWork.UserRepository.GetUserByNameAsync(User.GetUserName());
-            userParams.CurrentUserName = user.UserName;
+            var gender = await unitOfWork.UserRepository.GetUserGenderAsync(User.GetUserName());
+            userParams.CurrentUserName = User.GetUserName();
             if (string.IsNullOrEmpty(userParams.Gender)) 
             {
-                userParams.Gender = user.Gender == "male" ? 
+                userParams.Gender = gender == "male" ? 
                     "female" : "male";
             }
 

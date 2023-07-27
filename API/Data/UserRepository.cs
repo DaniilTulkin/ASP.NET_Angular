@@ -59,6 +59,12 @@ namespace API.Data
                 .Include(p => p.Photos)
                 .SingleOrDefaultAsync(x => x.UserName == userName);
 
+        public async Task<string> GetUserGenderAsync(string userName) =>
+            await context.Users
+                .Where( x=> x.UserName == userName)
+                .Select(x => x.Gender)
+                .FirstOrDefaultAsync();
+
         public async Task<IEnumerable<AppUser>> GetUsersAsync() => 
             await context.Users.Include(p => p.Photos).ToListAsync();
 
