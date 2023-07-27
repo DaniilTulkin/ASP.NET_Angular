@@ -15,11 +15,10 @@ export class MemberMessagesComponent {
   @Input() userName: string;
   content: string;
 
-  constructor(private messageService: MessageService) {}
+  constructor(public messageService: MessageService) {}
 
   sendMessage() {
-    this.messageService.sendMessage(this.userName, this.content ).subscribe(message => {
-      this.messages.push(message);
+    this.messageService.sendMessage(this.userName, this.content ).then(() => {
       this.form.reset();
     });
   }
