@@ -20,6 +20,7 @@ namespace API
             var services = scope.ServiceProvider;
             try
             {
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 var context = services.GetRequiredService<DataContext>();
                 var userManger = services.GetRequiredService<UserManager<AppUser>>();
                 var roleManger = services.GetRequiredService<RoleManager<AppRole>>(); 
